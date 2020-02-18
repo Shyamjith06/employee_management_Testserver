@@ -26,11 +26,6 @@ stage('Geting Ready for Docker-Stage-Deployment') {
    sh label: '', script: 'docker-compose up -d --build'
   }
   }
- stage('Production - Provisioning Approval') {
-  	input "Start provisioning the production server?"
-  }
-  stage('Downstream Build -- terraform')
-  {
-	 build 'Petclinic_Infrastructure'
-	}
+ 
+  
   }
