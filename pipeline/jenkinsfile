@@ -1,45 +1,36 @@
 node {
-    
      
   stage('Git-Checkout') {
-   git 'https://github.com/Shyamjith06/coe.git'
+   git 'https://github.com/Shyamjith06/coe-test.git'
   }
-    
+   
+
+stage('Geting Ready for Docker-Stage-Deployment') {
+    def server= Artifactory.server 'Artifactory'
+        def downloadSpec = """{
+            "files": [{
+            "pattern": "company/company-0.0.1-SNAPSHOT.war",
+            "target": "company/" }]
+        }"""
+    server.download(downloadSpec)  
+
+
+
+ }
  def project_path="company"
  
  dir(project_path) {
-    
-  stage('Maven-Clean') {
-   sh label: '', script: 'mvn clean'
-  }
-    
- stage('Maven-Compile') {
-   sh label: '', script: 'mvn compile'
-  }
- stage('Sonar Analysis'){
-withSonarQubeEnv('SonarQube')
-{ 
-sh 'mvn sonar:sonar'
-}
-}
-   stage('Maven-Test') {
-   sh label: '', script: 'mvn test'
-  }
   
-   stage('Maven-Package') {
-   sh label: '', script: 'mvn package'
+ 
+   stage('Docker-Stage-Deployment') {
+   sh label: '', script: 'docker-compose up -d --build'
   }
-  stage('Jfrog Artifacory Upload') {
-        def server= Artifactory.server 'Artifactory'
-                    def uploadSpec= """{
-                        "files": [{
-                        "pattern": "/root/.jenkins/workspace/coe/company/target/*.war",
-                        "target": "company"}]
-                    }"""
-        server.upload(uploadSpec)
-       
-        }
-
-   
-}
-}
+  }
+ stage('Production - Provisioning Approval') {
+  	input "Start provisioning the production server?"
+  }
+  stage('Downstream Build -- terraform')
+  {
+	 build 'Petclinic_Infrastructure'
+	}
+  }
