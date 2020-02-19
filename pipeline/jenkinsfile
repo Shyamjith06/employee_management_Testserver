@@ -1,7 +1,7 @@
 node {
      
   stage('Git-Checkout') {
-   git 'https://github.com/Shyamjith06/coe-test.git'
+   git 'https://github.com/Shyamjith06/employee_management_Testserver.git'
   }
    
 
